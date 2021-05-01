@@ -1,6 +1,7 @@
 // Import the express library
 const express = require('express');
 const mongoose = require('mongoose');
+require('dotenv').config();
 const ProductsModel = require('./models/ProductsModel.js');
 const UsersModel = require('./models/UsersModel.js');
 
@@ -195,7 +196,7 @@ server.post(
 );
 
 server.listen(
-    3001,
+    process.env.PORT || 3001,
     () => {
         console.log('connected to http://localhost:3001')
     }
