@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const productsRoutes = require('./routes/products');
-const UsersModel = require('./models/UsersModel.js');
+const usersRoutes = require('./routes/users');
 
 // express() will return an object with methods for server operations
 const server = express();
@@ -40,6 +40,14 @@ server.use(
     productsRoutes
 );
 
+// Any request that goes to http://www.myapp.com/user/
+server.use(
+    '/user',
+    usersRoutes
+);
+
+
+
 server.get(
     '/',                                // Same as, for example, http://www.myapp.com/
     (req, res) => {
@@ -71,49 +79,6 @@ server.get(
     }
 );
 
-server.post(
-    '/add-user',
-    (req, res) => {
-
-        // 1. Capture data from client (e.g, Postman or Browser)
-        const formData = {
-            "firstName": req.body.firstName,
-            "lastName": req.body.lastName,
-            "email": req.body.email,
-            "password": req.body.password,
-            "contactNumber": req.body.contactNumber,
-            "address": req.body.address
-        }
-
-        // 2. Upload the data to MongoDB
-        const newUsersModel = new UsersModel(formData)
-        
-        newUsersModel
-        .save() // Promise
-        .then( // When promise is resolved...
-            (dbDocument) => {
-                res.send(dbDocument)
-            }
-        )
-        .catch( // When promise is rejected...
-            (error) => {
-                res.send(error)
-            }
-        )
-
-    }
-);
-
-server.post(
-    '/register',
-    (req, res) => {
-        res.json(
-            {
-                data: "123"
-            }
-        )
-    }
-);
 
 server.listen(
     process.env.PORT || 3001,
