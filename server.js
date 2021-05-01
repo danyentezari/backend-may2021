@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
-const ProductsModel = require('./models/ProductsModel.js');
+const productsRoutes = require('./routes/products');
 const UsersModel = require('./models/UsersModel.js');
 
 // express() will return an object with methods for server operations
@@ -33,6 +33,13 @@ mongoose
     }
 );
 
+
+// Any request that goes to http://www.myapp.com/product/
+server.use(
+    '/product',
+    productsRoutes
+);
+
 server.get(
     '/',                                // Same as, for example, http://www.myapp.com/
     (req, res) => {
@@ -61,40 +68,6 @@ server.get(
         let product = req.query.product;
         let price = req.query.price;
         res.send("You searched for " + product + " under " + price + " AED")
-    }
-);
-
-/*
- * For mongoose methods, see https://mongoosejs.com/docs/api/model.html
- */
-server.post(
-    '/add-product',
-    (req, res) => {
-
-        // 1. Capture data from client (e.g, Postman or Browser)
-        const formData = {
-            "brand": req.body.brand,
-            "model": req.body.model,
-            "price": req.body.price
-        }
-        
-        // 2. Upload the data to MongoDB
-
-        // Instantiating an object for this data specifically
-        const newProductsModel = new ProductsModel(formData);
-
-        newProductsModel
-        .save() //  Promise
-        .then( //resolved...
-            (dbDocument) => {
-                res.send(dbDocument);
-            }
-        )
-        .catch( //rejected...
-            (error) => {
-                res.send(error)
-            }
-        );
     }
 );
 
@@ -141,60 +114,6 @@ server.post(
         )
     }
 );
-
-server.get(
-    '/product',
-    (req, res) => {
-
-        // Use the Mongo Model for Products to find a product
-        ProductsModel
-        .find(
-            { model: 'iPhone 12'}
-        )
-        // If the item is found in the database...
-        .then(
-            (dbDocument) => {
-                res.send(dbDocument);
-            }
-        )
-        // If the item is NOT found in the database...
-        .catch(
-            (error) => {
-                console.log('mongoose error', error);
-            }
-        );
-    }
-);
-
-server.post(
-    '/update-product',
-    (req, res) => {
-
-        ProductsModel
-        .findOneAndUpdate(
-            { 'model': 'iPhone 12' },
-            {
-                $set: {
-                   'price': 3800 
-                }
-            }
-        )
-         // If the item is found in the database...
-         .then(
-            (dbDocument) => {
-                res.send(dbDocument);
-            }
-        )
-        // If the item is NOT found in the database...
-        .catch(
-            (error) => {
-                console.log('mongoose error', error);
-            }
-        );
-
-    }
-);
-
 
 server.listen(
     process.env.PORT || 3001,
