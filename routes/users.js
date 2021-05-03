@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcryptjs = require('bcryptjs');
+const cloudinary = require('cloudinary').v2;
 const UsersModel = require('../models/UsersModel.js');
 
  // http://www.myapp.com/user/add
@@ -28,14 +29,34 @@ router.post(
         )
         // If MongoDB connection works
         .then(
-            (dbDocument) => {
+            async (dbDocument) => {
                 // (3.a) If email already exists, reject the registration
                 if(dbDocument) {
                     res.send("Sorry. An account with that email already exists");
                 }
                 // (3.b) If email is unique, proceed to step 4
                 else {
-                    // (4) Generate a salt with bcryptjs
+
+                    // (4.a) If image is provided, upload to cloudinary
+                    const theFiles = Object.values(req.files);
+                    if( theFiles.length > 0 ) {
+                        
+                        // Upload to cloudinary
+                       await cloudinary.uploader.upload(
+                            theFiles[0].path,
+                            (cloudinaryErr, cloudinaryResult) => {
+                                if(cloudinaryErr) {
+                                    console.log(cloudinaryErr)
+                                }
+                                else {
+                                    // Append the URL of the image in newUsersModel
+                                    newUsersModel.avatar = cloudinaryResult.url
+                                }
+                            }
+                        )
+                    }
+
+                    // (4.b) Generate a salt with bcryptjs
                     bcryptjs.genSalt(
                         (err, theSalt) => {
 

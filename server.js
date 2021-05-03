@@ -1,6 +1,8 @@
 // Import the express library
 const express = require('express');
 const mongoose = require('mongoose');
+const expressFormData = require('express-form-data');
+const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 const productsRoutes = require('./routes/products');
 const usersRoutes = require('./routes/users');
@@ -19,6 +21,8 @@ const connectionConfig = {
 // Configure express to read body in HTTP
 server.use( express.urlencoded({ extended: false }) );
 server.use( express.json() );
+// Also tell express to read HTTP form data
+server.use(expressFormData.parse());
 
 mongoose
 .connect(connectionString, connectionConfig) // Promise
@@ -32,6 +36,16 @@ mongoose
         console.log('database error', error)
     }
 );
+
+
+// Configure for Cloudinary
+cloudinary.config(
+    {
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    }
+)
 
 // Any request that goes to http://www.myapp.com/product/
 server.use(

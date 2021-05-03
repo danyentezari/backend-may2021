@@ -24,6 +24,9 @@ const UsersSchema = new mongoose.Schema(
         },
         address: {
             type: String,
+        },
+        avatar: {
+            type: String
         }
     }
 );
