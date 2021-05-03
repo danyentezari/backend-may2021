@@ -33,7 +33,6 @@ mongoose
     }
 );
 
-
 // Any request that goes to http://www.myapp.com/product/
 server.use(
     '/product',
@@ -45,8 +44,6 @@ server.use(
     '/user',
     usersRoutes
 );
-
-
 
 server.get(
     '/',                                // Same as, for example, http://www.myapp.com/
