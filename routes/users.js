@@ -4,7 +4,7 @@ const bcryptjs = require('bcryptjs');
 const cloudinary = require('cloudinary').v2;
 const UsersModel = require('../models/UsersModel.js');
 
- // http://www.myapp.com/user/add
+// http://www.myapp.com/user/add
 router.post(
     '/add',
     (req, res) => {
@@ -16,7 +16,7 @@ router.post(
             "email": req.body.email,
             "password": req.body.password,
             "contactNumber": req.body.contactNumber,
-            "address": req.body.address
+            "address": req.body.address,
         }
 
         // (2) Create instance of UsersModel
@@ -60,6 +60,8 @@ router.post(
                     bcryptjs.genSalt(
                         (err, theSalt) => {
 
+                            console.log('theSalt', theSalt)
+
                             // (5) Hash the password with the salt
                             bcryptjs.hash(
                                 formData.password,
@@ -98,6 +100,7 @@ router.post(
         )
     }
 );
+
 
 
 module.exports = router;

@@ -7,6 +7,50 @@ require('dotenv').config();
 const productsRoutes = require('./routes/products');
 const usersRoutes = require('./routes/users');
 
+// Import passport for authentication
+const passport = require('passport');
+// Import for JWT strategy
+const JwtStrategy =  require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+
+// Referece a secret data for the jsonwebtoken
+const jwtSecret = process.env.JWT_SECRET;
+
+const passportJwtConfig = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: jwtSecret
+}
+
+// This function is what will read the contents (payload) of the jsonwebtoken
+const passportJwt = (passport) => {
+    // Configure passport to use passport-jwt
+    passport.use(
+        new JwtStrategy(
+            passportJwtConfig, 
+            (jwtPayload, done) => {
+
+                // Extract and find the user by their id (contained jwt)
+                UsersModel
+                .findOne({ _id: jwtPayload.id })
+                .then(
+                    // If the document was found
+                    (dbDocument) => {
+                        return done(null, dbDocument);
+                    }
+                )
+                .catch(
+                    // If something went wrong with database search
+                    (err) => {
+                        return done(null, null);
+                    }
+                )
+            }
+        )
+    )
+};
+
+passportJwt(passport);
+
 // express() will return an object with methods for server operations
 const server = express();
 
@@ -61,6 +105,7 @@ server.use(
 
 server.get(
     '/',                                // Same as, for example, http://www.myapp.com/
+    //passport.authenticate('jwt', {session:false}),
     (req, res) => {
         res.send('<h1>Welcome Home!</h1>');
     }
