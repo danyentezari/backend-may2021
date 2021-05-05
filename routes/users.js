@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const cloudinary = require('cloudinary').v2;
 const UsersModel = require('../models/UsersModel.js');
+require('dotenv').config()
+const jwtSecret = process.env.JWT_SECRET;
+
 
 // http://www.myapp.com/user/add
 router.post(
@@ -101,6 +105,78 @@ router.post(
     }
 );
 
+// http://www.myapp.com/user/login
+router.post(
+    '/login',
+    (req, res) => {
 
+        // (1) Capture data from client (e.g, Postman or Browser)
+        const formData = {
+            "email": req.body.email,
+            "password": req.body.password
+        }
+
+        // (2) Check for email match in database
+        UsersModel
+        .findOne({ email: formData.email })
+        // If MongoDB responds
+        .then(
+            (dbDocument) => {
+
+                // (3.a) If email doesn't exists, reject login
+                if(!dbDocument) {
+                    res.send("Sorry. Wrong email or password");
+                }
+                // (3.b) If email does exist, retrieve the document
+                else {
+                    // (4) Check the password
+                    bcryptjs
+                    .compare(formData.password, dbDocument.password)
+                    // If .compare() works
+                    .then(
+                        (isMatch) => {
+                            // (5.a) If password is incorrect, reject the login
+                            if(!isMatch) {
+                                res.send("Sorry. Wrong email or password");
+                            }
+                            // (5.b) If password is correct, prepare to send the json web token
+                            else {                            
+                                // (6) Prepare the payload
+                                const payload = {
+                                    id: dbDocument.id
+                                }
+
+                                // (7) Send to client the json web token
+                                jwt
+                                .sign(
+                                    payload,
+                                    jwtSecret,
+                                    (err, jsonwebtoken) => {
+                                        res.send(jsonwebtoken)
+                                    }
+                                )
+                            }
+                        }
+                    )
+                    // If .compare() fails to compare
+                    .catch(
+                        () => {
+                            console.log('error', error);
+                            res.send('error');
+                        }
+                    )
+                }
+            }
+        )
+        // If MongoDB does not respond
+        .catch(
+            (error) => {
+                console.log('error', error);
+                res.send('error');
+            }
+        )
+
+    }
+)
 
 module.exports = router;

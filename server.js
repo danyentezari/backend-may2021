@@ -6,6 +6,7 @@ const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 const productsRoutes = require('./routes/products');
 const usersRoutes = require('./routes/users');
+const UsersModel = require('./models/UsersModel');
 
 // Import passport for authentication
 const passport = require('passport');
@@ -105,7 +106,7 @@ server.use(
 
 server.get(
     '/',                                // Same as, for example, http://www.myapp.com/
-    //passport.authenticate('jwt', {session:false}),
+    passport.authenticate('jwt', {session:false}),
     (req, res) => {
         res.send('<h1>Welcome Home!</h1>');
     }
