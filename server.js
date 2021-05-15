@@ -1,5 +1,6 @@
 // Import the express library
 const express = require('express');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const expressFormData = require('express-form-data');
 const cloudinary = require('cloudinary').v2;
@@ -68,6 +69,9 @@ server.use( express.urlencoded({ extended: false }) );
 server.use( express.json() );
 // Also tell express to read HTTP form data
 server.use(expressFormData.parse());
+
+// Allow Cross-Origin Resource Sharing
+server.use(cors());
 
 mongoose
 .connect(connectionString, connectionConfig) // Promise
