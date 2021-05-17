@@ -27,6 +27,10 @@ const UsersSchema = new mongoose.Schema(
         },
         avatar: {
             type: String
+        },
+        dateCreated: {
+            type: Date,
+            default: Date.now
         }
     }
 );
