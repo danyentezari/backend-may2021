@@ -152,7 +152,7 @@ router.post(
                                     payload,
                                     jwtSecret,
                                     (err, jsonwebtoken) => {
-                                        res.send(jsonwebtoken)
+                                        res.json(jsonwebtoken);
                                     }
                                 )
                             }
