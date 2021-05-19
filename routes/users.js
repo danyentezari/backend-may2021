@@ -152,7 +152,13 @@ router.post(
                                     payload,
                                     jwtSecret,
                                     (err, jsonwebtoken) => {
-                                        res.json(jsonwebtoken);
+                                        res.json({
+                                            firstName: dbDocument.firstName,
+                                            lastName: dbDocument.lastName,
+                                            email: dbDocument.email,
+                                            avatar: dbDocument.avatar,
+                                            jsonwebtoken
+                                        });
                                     }
                                 )
                             }
